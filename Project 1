@@ -1,1 +1,2180 @@
-
+{
+  "name": "portofolio 1",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "messages"
+        ],
+        "options": {}
+      },
+      "type": "n8n-nodes-base.whatsAppTrigger",
+      "typeVersion": 1,
+      "position": [
+        -3312,
+        -1152
+      ],
+      "id": "234bea50-5504-4762-ba9c-53c45b746a0b",
+      "name": "WhatsApp Trigger",
+      "webhookId": "0d8893e8-2ab5-4222-b7ff-ea08d0dd8dbb"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "fc08221f-238e-4498-aaa1-fcb93aa5c2c5",
+              "name": "User prompt",
+              "value": "={{ $json.messages[0].text.body }}",
+              "type": "string"
+            },
+            {
+              "id": "895608e3-e881-48c5-aa29-0f0b1648b6a2",
+              "name": "User prompt",
+              "value": "={{ $json.content.parts[0].text }}",
+              "type": "string"
+            },
+            {
+              "id": "67486208-13c7-4265-9595-1e46823d27c0",
+              "name": "User prompt",
+              "value": "=this is the content of the image user provided:\n{{ $json.content.parts[0].text }}.\n{{ $('WhatsApp Trigger').item.json.messages[0].image.caption }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1296,
+        -672
+      ],
+      "id": "4d37d2d3-14fd-42e1-9802-bffcdb63e161",
+      "name": "Edit Fields"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1920,
+        -672
+      ],
+      "id": "2392c377-f1e0-49d7-a4a1-29351212f527",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "resource": "audio",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-latest"
+        },
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1696,
+        -672
+      ],
+      "id": "51e94872-7a89-4da4-8a9c-262310fcf487",
+      "name": "Transcribe a recording"
+    },
+    {
+      "parameters": {
+        "url": "={{ $json.url }}",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        -1920,
+        -384
+      ],
+      "id": "b0349bef-86a1-4093-ac0f-a5ebd0fc32e6",
+      "name": "HTTP Request1"
+    },
+    {
+      "parameters": {
+        "resource": "image",
+        "operation": "analyze",
+        "modelId": {
+          "__rl": true,
+          "value": "models/gemini-flash-latest",
+          "mode": "list",
+          "cachedResultName": "models/gemini-flash-latest"
+        },
+        "text": "describe this image.",
+        "inputType": "binary",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.googleGemini",
+      "typeVersion": 1.1,
+      "position": [
+        -1696,
+        -384
+      ],
+      "id": "6b6a2dc0-7654-4d5f-8e5e-5d2117281405",
+      "name": "Analyze an image",
+      "retryOnFail": true,
+      "maxTries": 2
+    },
+    {
+      "parameters": {
+        "content": "## whatsapp trigger\n",
+        "height": 304,
+        "width": 272,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3392,
+        -1296
+      ],
+      "typeVersion": 1,
+      "id": "ae1b526e-6818-4a1a-bd3c-7f71c7cd5215",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## message type router\n",
+        "height": 304,
+        "width": 256,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2592,
+        -784
+      ],
+      "typeVersion": 1,
+      "id": "c7b7bf23-6afd-4f67-b889-a4f7b470e2a6",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## voice\n\n\n",
+        "height": 304,
+        "width": 944,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2320,
+        -784
+      ],
+      "typeVersion": 1,
+      "id": "8a3f9fc5-8d55-4ba1-8d7f-bc36996df6af",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## image\n\n",
+        "height": 304,
+        "width": 944,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2320,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "4d14fd30-181b-454c-a43d-a0abd204d18e",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## LLM's user message",
+        "height": 304,
+        "width": 288,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1360,
+        -784
+      ],
+      "typeVersion": 1,
+      "id": "48a13158-f1e9-4144-a906-564ab6849c39",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## AI_Agent",
+        "height": 304,
+        "width": 464,
+        "color": "#C9D6C2"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        -784
+      ],
+      "typeVersion": 1,
+      "id": "d5856cc7-22ac-46b6-9592-dc3306703ef4",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Switch').item.json.contacts[0].wa_id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        -1184,
+        -304
+      ],
+      "id": "8279a3f5-0a8b-4701-ac14-21e40a4badf5",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1Vxx4d3f3unUK9qv3fCvn_DknthgBxoEG",
+          "mode": "list",
+          "cachedResultName": "rag",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1Vxx4d3f3unUK9qv3fCvn_DknthgBxoEG"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        -1600,
+        -1568
+      ],
+      "id": "a03c0bb9-f331-417a-8e60-cf8b54f3c48a",
+      "name": "Google Drive Trigger"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        -1200,
+        -1568
+      ],
+      "id": "e0743163-c64c-4f7e-ab84-ba0403de3423",
+      "name": "Download file"
+    },
+    {
+      "parameters": {
+        "operation": "text",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.extractFromFile",
+      "typeVersion": 1.1,
+      "position": [
+        -992,
+        -1568
+      ],
+      "id": "de8d5d7d-bd3c-4025-a760-6516db661e28",
+      "name": "Extract from File"
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {
+          "queryName": "match_documents"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -480,
+        -1568
+      ],
+      "id": "36ab82c7-1413-4311-9909-034ce4e2adfa",
+      "name": "Supabase Vector Store"
+    },
+    {
+      "parameters": {
+        "textSplittingMode": "custom",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1.1,
+      "position": [
+        -416,
+        -1264
+      ],
+      "id": "d29026ab-4452-41a8-a104-b4fda08fcd6f",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkSize": 200,
+        "chunkOverlap": 20,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        -448,
+        -1072
+      ],
+      "id": "bd509bbc-663d-4f06-b73d-ac451e8882b1",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -544,
+        -1312
+      ],
+      "id": "0ac86056-8a59-4698-98f8-0dc3cb3e7601",
+      "name": "Embeddings Google Gemini"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "ae3581d5-2cd4-4afb-b98a-2c2c451c015e",
+              "name": "id",
+              "value": "={{ $json.id }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -1392,
+        -1568
+      ],
+      "id": "d042f7e9-e4af-47f0-bc21-4dd33da7d836",
+      "name": "Edit Fields1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "d0024de8-af94-4c00-91ad-7002b2e197d5",
+              "name": "data",
+              "value": "={{ $json.data }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -688,
+        -1568
+      ],
+      "id": "0e3d2cc1-e941-4243-86e8-df92240d775e",
+      "name": "Edit Fields2"
+    },
+    {
+      "parameters": {
+        "content": "## chat-Client_database router + password_Checker\n",
+        "height": 304,
+        "width": 288,
+        "color": 2
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -3088,
+        -1296
+      ],
+      "typeVersion": 1,
+      "id": "7eacc6ac-9151-40f3-b0a8-09d1e933bc76",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "text",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "e8178617-c745-43c4-8a9d-4e7b419209bb"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "text"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "19a9ec45-7c96-46bd-b5de-682313386c49",
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "audio",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "audio"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "bab31eb9-a733-4922-b75e-74b875203784",
+                    "leftValue": "={{ $json.messages[0].type }}",
+                    "rightValue": "image",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "image"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -2512,
+        -688
+      ],
+      "id": "a8276d5b-cdc7-4525-bae6-9d135917b412",
+      "name": "Switch"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ab1fd6b2-5b72-407b-a9ff-b1aa08b11885",
+              "leftValue": "={{ $json.messages[0].text.body }}",
+              "rightValue": "Password=\"put_a_pasword\"",
+              "operator": {
+                "type": "string",
+                "operation": "contains"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -3008,
+        -1152
+      ],
+      "id": "c28feae7-fd22-45f1-8fa0-038902eb38c6",
+      "name": "Chat-Database Router"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "7114d562-ed81-4d1c-924a-8da3128fe9ab",
+              "leftValue": "={{ $json.contacts[0].wa_id }}",
+              "rightValue": "\"put_a_phone_number_(201xxxxxxxxx)\"",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "65178c3f-884e-4e94-b4a0-7aeb55aba08f",
+              "leftValue": "={{ $json.messages[0].from_user_id }}",
+              "rightValue": "\"put_\"",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -2528,
+        -1264
+      ],
+      "id": "d0441474-f25c-4f32-b4e0-9550b666b122",
+      "name": "ID Verifier"
+    },
+    {
+      "parameters": {
+        "content": "## Client_Info_database",
+        "height": 400,
+        "width": 928,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2592,
+        -1328
+      ],
+      "typeVersion": 1,
+      "id": "2085ce83-e5d8-48c7-a887-06d32252b7a5",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "modelName": "models/gemini-embedding-001"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        -512,
+        128
+      ],
+      "id": "1728064c-b772-4d84-85d9-280c7a0b9562",
+      "name": "Embeddings Google Gemini1"
+    },
+    {
+      "parameters": {
+        "description": "Get any information you need about Doctors and the hospital from here",
+        "topK": 5
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1.1,
+      "position": [
+        -432,
+        -368
+      ],
+      "id": "0a484b1e-b412-42d6-89c4-f66e84d08eb6",
+      "name": "Answer questions with a vector store"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1092120670650329",
+        "recipientPhoneNumber": "=+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -352,
+        -672
+      ],
+      "id": "38b2de4d-1cca-47b1-ab73-76c1b214c277",
+      "name": "Send message",
+      "webhookId": "800670ec-4869-4bc8-9f9c-ec94d052a538"
+    },
+    {
+      "parameters": {
+        "content": "## Emergency\n\n",
+        "height": 304,
+        "width": 464,
+        "color": "#F5A3A3"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "975141e3-a83b-4603-ac6b-c12e3678dded",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Hospital DataBase\n\n",
+        "height": 752,
+        "width": 464,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -576,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "1e770a56-a856-4080-93b7-ad654c85101a",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Clients DataBase\n",
+        "height": 432,
+        "width": 464,
+        "color": "#C9D6C2"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1056,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "74df8a9d-f158-4165-a08f-077691be225d",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Agent Brain",
+        "height": 304,
+        "width": 288,
+        "color": "#C9D6C2"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1360,
+        -464
+      ],
+      "typeVersion": 1,
+      "id": "f7c5b324-f01d-4247-878e-51253dd78520",
+      "name": "Sticky Note12"
+    },
+    {
+      "parameters": {
+        "content": "## Hospital Dataase",
+        "height": 912,
+        "width": 1536,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1648,
+        -1840
+      ],
+      "typeVersion": 1,
+      "id": "b0c3e70e-54e8-4073-ac09-76c0b172bdb5",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "chatId": "\"put_a_chat_id\"",
+        "text": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Text', ``, 'string') }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegramTool",
+      "typeVersion": 1.2,
+      "position": [
+        -864,
+        -416
+      ],
+      "id": "21336e95-4ec1-43af-a045-c8b552d97986",
+      "name": "Send to reception (Emergency)",
+      "webhookId": "f9e86893-b9bf-4b09-be55-2bbd17f40a3e"
+    },
+    {
+      "parameters": {
+        "sendTo": "\"put_an_email\"",
+        "subject": "Emergency!!",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -1008,
+        -320
+      ],
+      "id": "dd0c4712-b019-4add-b87b-9cc02fa9526c",
+      "name": "Send to manager (Emergency)",
+      "webhookId": "986f38a7-7729-4726-8989-9c376c6c3190"
+    },
+    {
+      "parameters": {
+        "sendTo": "\"put_an_email\"",
+        "subject": "Client Request",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -720,
+        -320
+      ],
+      "id": "a086e620-5444-4150-aa7b-2fbc6a63fb4d",
+      "name": "Send to reception (Contact_Coustomer)",
+      "webhookId": "e34bdcf0-0ccd-4b0e-9068-f70be6eb3e98"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis",
+          "mode": "list",
+          "cachedResultName": "portofolio 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_name', ``, 'string') }}",
+            "client_phone_number": "=+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+            "client_age": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_age', ``, 'string') }}",
+            "client_problem": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_problem', ``, 'string') }}",
+            "status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('status', ``, 'string') }}",
+            "Doctor's name and speciality": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doctor_s_name_and_speciality', ``, 'string') }}",
+            "appointment time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_time', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "client_phone_number"
+          ],
+          "schema": [
+            {
+              "id": "client_name",
+              "displayName": "client_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_phone_number",
+              "displayName": "client_phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "client_age",
+              "displayName": "client_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_problem",
+              "displayName": "client_problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "appointment time",
+              "displayName": "appointment time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Doctor's name and speciality",
+              "displayName": "Doctor's name and speciality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -992,
+        112
+      ],
+      "id": "585f65a4-9412-4c45-ad02-766c0569d557",
+      "name": "Update row in clients database"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis",
+          "mode": "list",
+          "cachedResultName": "portofolio 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -864,
+        -32
+      ],
+      "id": "df63fa6c-f955-4477-b76e-4c85e28544de",
+      "name": "get row in clients database"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis",
+          "mode": "list",
+          "cachedResultName": "portofolio 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_name": "={{ $fromAI('client_name', ``, 'string') }}",
+            "client_phone_number": "=+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+            "client_age": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_age', ``, 'string') }}",
+            "client_problem": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_problem', ``, 'string') }}",
+            "status": "=Valid",
+            "Doctor's name and speciality": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doctor_s_name_and_speciality', ``, 'string') }}",
+            "appointment time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_time', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "client_name",
+              "displayName": "client_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_phone_number",
+              "displayName": "client_phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_age",
+              "displayName": "client_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_problem",
+              "displayName": "client_problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "appointment time",
+              "displayName": "appointment time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Doctor's name and speciality",
+              "displayName": "Doctor's name and speciality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -736,
+        112
+      ],
+      "id": "b627ee75-0528-4850-9214-5fc9a8304db7",
+      "name": "Append row in clients database"
+    },
+    {
+      "parameters": {
+        "tableName": {
+          "__rl": true,
+          "value": "documents",
+          "mode": "list",
+          "cachedResultName": "documents"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreSupabase",
+      "typeVersion": 1.3,
+      "position": [
+        -496,
+        -176
+      ],
+      "id": "1eeb2672-aad3-4790-bf0f-ffa19ddf0191",
+      "name": "Hosital DataBase"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('WhatsApp Trigger').item.json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "=## Overview\nYou are a hospital virtual receptionist. Handle emergencies, doctor availability, appointments, symptom guidance, and hospital FAQs. The current date and time is {{ $now.toString() }}\n\n## Tools\n- Send to reception (Emergency): Use for confirmed emergencies\n- Send to manager (Emergency): Use for critical escalations\n- Send to reception (Contact_Coustomer): Use when diagnosis is requested or human follow-up needed\n- Answer questions with a vector store: Use for hospital FAQs/info\n- Google Gemini Chat Model: Use for reasoning and responses\n- Simple Memory: Store/retrieve conversation context\n- get row in clients database: use to get the appointments data in the cliens database\n- update row in clients database: use to edit the appointment data in the client database\n- append row in clients database: use it to make a new appontment, after checking if this time is free with the doctor requested using the (get row in clients database) tool to prevent making overlaps (always leave at least 30 minutes between appointments with the same doctor)\n- Send a message to the doctor: use this tool to send a message to the doctor to inform him about any new appointment with him, you can get doctor's email using (Answer questions with a vector store) tool\n- Send to reception (Contact_Coustomer) new appointment: use this tool to inform the reciption about any new appointment\n\n\n## Rules\n- get any information you need about the hospital (Like: adress and services avilable) and any details you need about the doctors (Like: contact info and Consultation Fee) from (Answer questions with a vector store) tool\n- Always confirm before escalating emergencies, and send the patient name and his phone number, his name is {{ $('WhatsApp Trigger').item.json.contacts[0].profile.name }} and his phone number is +{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}\n- Never diagnose; first ask if the costumer needs to book an appointment or needs a staff member to contact him to diagnose him, if he needs a staff member to diagnose him, send to the recciption using (Send to reception (Contact_Coustomer)) tool\n- Prioritize: emergency > availability > appointments > symptoms > info\n- Output plain text only\n- always talk to the client with his language, client's language: (EN)\n\n## Instructions\n1) Classify user intent\n2) Use appropriate tool(s)\n3) Respond concisely and clinically\n\n## Examples\n1)\nInput: “I have chest pain”\n- Action: Ask confirmation → Send to reception (Emergency)\n- Output: “Emergency reported. Assistance is on the way.”\n2) input: \"I have pain in my teeth\"\n- Action: ask if he needs to book an appointment with the dentits if yes → tak his information and book an appointment"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -944,
+        -672
+      ],
+      "id": "c3d21c85-36f7-4f8b-9069-5e40f6da3e3d",
+      "name": "Main AI Agent"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $('WhatsApp Trigger').item.json.messages[0].image.id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -2144,
+        -384
+      ],
+      "id": "b8fde3c0-2011-4783-8dd5-a9ce37cb436b",
+      "name": "Download image",
+      "webhookId": "ff8c821f-d83a-41b5-a427-ed522059818a"
+    },
+    {
+      "parameters": {
+        "resource": "media",
+        "operation": "mediaUrlGet",
+        "mediaGetId": "={{ $json.messages[0].audio.id }}"
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -2144,
+        -672
+      ],
+      "id": "f8d7f1fa-6039-44bf-a6be-a7c904f53f2d",
+      "name": "Download Voice",
+      "webhookId": "ff8c821f-d83a-41b5-a427-ed522059818a"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('WhatsApp Trigger').item.json.messages[0].text.body }}",
+        "options": {
+          "systemMessage": "=## Overview\nYou are a client and appointment database manager. Your job is to check, book, edit, and cancel appointments across client and doctor databases. The current date and time is {{ $now.toString() }}\n\n## Tools\n- Google Gemini Chat Model: Reason and decisions\n- Update row in clients database1: use it to edit or cancel an appointment if requested\n- get row in clients database1: use it to get an appointment info\n- Append row in clients database1: use it to register a new appointment after checking if the time is free with (get row in clients database1) tool\n\n## Rules\n- Always read before write\n- Don't ever output the password or put it in theappointment information\n- to cancel an appointment, use (Update row in clients database1) tool to write beside the client name (canceled)\n- Output structured data only\n\n## Instructions\n1) Identify action (check/book/edit/cancel)\n2) Read database\n3) Apply changes consistently\n4) Return result\n\n## Examples\n1)\nInput: Cancel the appointment, client phone number is 123123\n- Action: Read → update the appointment and write (canceled) beside the client name\n- Output: appointment canceled successfuly"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -2288,
+        -1280
+      ],
+      "id": "57a2ccec-5612-4807-a6ea-4906c4b3f754",
+      "name": "Client DataBase AI Agent"
+    },
+    {
+      "parameters": {
+        "content": "## Delete Old Appointments",
+        "height": 496,
+        "width": 928,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2592,
+        -1840
+      ],
+      "typeVersion": 1,
+      "id": "4dc72ff3-8ce1-461a-8a2a-87d6348bc1e9",
+      "name": "Sticky Note18"
+    },
+    {
+      "parameters": {
+        "rule": {
+          "interval": [
+            {
+              "triggerAtHour": 8
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.scheduleTrigger",
+      "typeVersion": 1.3,
+      "position": [
+        -2528,
+        -1760
+      ],
+      "id": "057a57c5-587d-430e-8b6b-95ff50628dd1",
+      "name": "Schedule Trigger"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Do Your Jop",
+        "options": {
+          "systemMessage": "=##You Are An appointment manger, your jop is to check the appointment sheets, then Delete any appointment that it's time had passed, the date now is: {{ $json.Year }}/{{ $json.Month }}/{{ $json['Day of month'] }}, the time now is: {{ $json.Hour }}:{{ $json.Minute }}\n\n##tools:\nget row in clients database2: use this tool to get all the clients appintments\ndelete row in clients database3: use this tool to delete ONLY the appointments that it's time had gone\n\n"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -2256,
+        -1776
+      ],
+      "id": "e3c77530-111c-41eb-be75-a1f339122791",
+      "name": "Delete Old Appointments AI Agent"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "documentId": {
+          "__rl": true,
+          "value": "1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis",
+          "mode": "list",
+          "cachedResultName": "portofolio 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_name": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_name', ``, 'string') }}",
+            "client_phone_number": "=+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+            "client_age": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_age', ``, 'string') }}",
+            "client_problem": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_problem', ``, 'string') }}",
+            "status": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('status', ``, 'string') }}",
+            "Doctor's name and speciality": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doctor_s_name_and_speciality', ``, 'string') }}",
+            "appointment time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_time', ``, 'string') }}"
+          },
+          "matchingColumns": [
+            "client_phone_number"
+          ],
+          "schema": [
+            {
+              "id": "client_name",
+              "displayName": "client_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_phone_number",
+              "displayName": "client_phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "client_age",
+              "displayName": "client_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_problem",
+              "displayName": "client_problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "appointment time",
+              "displayName": "appointment time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Doctor's name and speciality",
+              "displayName": "Doctor's name and speciality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "row_number",
+              "displayName": "row_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "readOnly": true,
+              "removed": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -2160,
+        -1088
+      ],
+      "id": "74529c75-10e8-442e-ae78-931423911ecc",
+      "name": "Update row in clients database1"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis",
+          "mode": "list",
+          "cachedResultName": "portofolio 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -2016,
+        -1104
+      ],
+      "id": "b48df229-8166-452a-8252-8122d09ea7b4",
+      "name": "get row in clients database1"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis",
+          "mode": "list",
+          "cachedResultName": "portofolio 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "client_name": "={{ $fromAI('client_name', ``, 'string') }}",
+            "client_phone_number": "=+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+            "client_age": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_age', ``, 'string') }}",
+            "client_problem": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('client_problem', ``, 'string') }}",
+            "status": "=Valid",
+            "Doctor's name and speciality": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Doctor_s_name_and_speciality', ``, 'string') }}",
+            "appointment time": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('appointment_time', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "client_name",
+              "displayName": "client_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_phone_number",
+              "displayName": "client_phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_age",
+              "displayName": "client_age",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "client_problem",
+              "displayName": "client_problem",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "appointment time",
+              "displayName": "appointment time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Doctor's name and speciality",
+              "displayName": "Doctor's name and speciality",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "status",
+              "displayName": "status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -1872,
+        -1120
+      ],
+      "id": "389fedd6-b4d8-4ef3-b32e-5a8608b854c9",
+      "name": "Append row in clients database1"
+    },
+    {
+      "parameters": {
+        "operation": "send",
+        "phoneNumberId": "1092120670650329",
+        "recipientPhoneNumber": "=+{{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+        "textBody": "={{ $json.output }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.whatsApp",
+      "typeVersion": 1.1,
+      "position": [
+        -1888,
+        -1280
+      ],
+      "id": "c339a0f9-3b44-4c7c-ac96-b6f7aea4626c",
+      "name": "Send message1",
+      "webhookId": "d1ed1feb-70de-4506-b212-fbeec327b52a"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis",
+          "mode": "list",
+          "cachedResultName": "portofolio 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -1920,
+        -1504
+      ],
+      "id": "f848c61d-9dd6-4617-8fd8-8cb7887b7125",
+      "name": "get row in clients database2"
+    },
+    {
+      "parameters": {
+        "operation": "delete",
+        "documentId": {
+          "__rl": true,
+          "value": "1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis",
+          "mode": "list",
+          "cachedResultName": "portofolio 1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1_2gxO9AgHgTWEGkkdIfTbdUYjAcplzS71_2aiyxlCis/edit#gid=0"
+        }
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        -2144,
+        -1504
+      ],
+      "id": "093284f8-e6b3-4ac4-8d7a-1eb7e656196a",
+      "name": "delete row in clients database3"
+    },
+    {
+      "parameters": {
+        "content": "## Inform Staff",
+        "height": 432,
+        "width": 288,
+        "color": "#C9D6C2"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1360,
+        -144
+      ],
+      "typeVersion": 1,
+      "id": "5da9388c-c2b3-4427-82c4-88434e9c4243",
+      "name": "Sticky Note14"
+    },
+    {
+      "parameters": {
+        "sendTo": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('To', ``, 'string') }}",
+        "subject": "new appointment",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -1200,
+        -48
+      ],
+      "id": "e93eb776-d181-4a19-b5ac-d2b53d2b8647",
+      "name": "Send a message to the doctor",
+      "webhookId": "fec7c7f5-52c4-4091-ab11-108a94a0268e"
+    },
+    {
+      "parameters": {
+        "sendTo": "\"put_an_email\"",
+        "subject": "Client Request",
+        "emailType": "text",
+        "message": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('Message', ``, 'string') }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        -1312,
+        80
+      ],
+      "id": "7c1dbf53-36ee-4b58-83d1-3d5a2f1b9a43",
+      "name": "Send to reception (Contact_Coustomer) new appointment",
+      "webhookId": "e34bdcf0-0ccd-4b0e-9068-f70be6eb3e98"
+    },
+    {
+      "parameters": {
+        "content": "## Made By: Mostafa Elshorbagy - LinkedIn: https://www.linkedin.com/in/mostafa-elshorbagy",
+        "height": 112,
+        "width": 2464,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2592,
+        -912
+      ],
+      "typeVersion": 1,
+      "id": "ca549a82-b11b-4b0d-ad1d-8de1e64c062b",
+      "name": "Sticky Note15"
+    },
+    {
+      "parameters": {
+        "content": "## Reply\n",
+        "height": 304,
+        "width": 464,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -576,
+        -784
+      ],
+      "typeVersion": 1,
+      "id": "6ec50e14-e9d0-4c0a-8e21-ceacf9f9d21e",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3.1",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -1312,
+        -352
+      ],
+      "id": "c024a991-d0bd-4306-8a36-4f96037c7c87",
+      "name": "OpenRouter Chat Model"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3.1",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -320,
+        80
+      ],
+      "id": "f30ac189-8e7c-437f-a1fd-296a87f0b401",
+      "name": "OpenRouter Chat Model1"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3.1",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2320,
+        -1488
+      ],
+      "id": "87e3e1b7-911d-49d4-a8fc-1048b4795356",
+      "name": "OpenRouter Chat Model2"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat-v3.1",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -2352,
+        -1072
+      ],
+      "id": "cf68db9c-790c-4f18-be64-bfb2775fb4c7",
+      "name": "OpenRouter Chat Model3"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "WhatsApp Trigger": {
+      "main": [
+        [
+          {
+            "node": "Chat-Database Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request": {
+      "main": [
+        [
+          {
+            "node": "Transcribe a recording",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Transcribe a recording": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "HTTP Request1": {
+      "main": [
+        [
+          {
+            "node": "Analyze an image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze an image": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields": {
+      "main": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Extract from File",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extract from File": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields1": {
+      "main": [
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Edit Fields2": {
+      "main": [
+        [
+          {
+            "node": "Supabase Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch": {
+      "main": [
+        [
+          {
+            "node": "Edit Fields",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download Voice",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Download image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Chat-Database Router": {
+      "main": [
+        [
+          {
+            "node": "ID Verifier",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Switch",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "ID Verifier": {
+      "main": [
+        [
+          {
+            "node": "Client DataBase AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Google Gemini1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Hosital DataBase",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Answer questions with a vector store": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to reception (Emergency)": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to manager (Emergency)": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to reception (Contact_Coustomer)": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in clients database": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get row in clients database": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in clients database": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hosital DataBase": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Main AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download image": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download Voice": {
+      "main": [
+        [
+          {
+            "node": "HTTP Request",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Client DataBase AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Send message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Schedule Trigger": {
+      "main": [
+        [
+          {
+            "node": "Delete Old Appointments AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Update row in clients database1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Client DataBase AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get row in clients database1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Client DataBase AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in clients database1": {
+      "ai_tool": [
+        [
+          {
+            "node": "Client DataBase AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "get row in clients database2": {
+      "ai_tool": [
+        [
+          {
+            "node": "Delete Old Appointments AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "delete row in clients database3": {
+      "ai_tool": [
+        [
+          {
+            "node": "Delete Old Appointments AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message to the doctor": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send to reception (Contact_Coustomer) new appointment": {
+      "ai_tool": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Main AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Answer questions with a vector store",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Client DataBase AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Delete Old Appointments AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "db4c8dd2-379a-433e-97da-052c8a8aa13a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "5db0178ecd50a28bc8ab1f161242c8caff1e2d92b4807599c74dd3624d8a76f6"
+  },
+  "id": "OKkP6To21wVFjVzJ",
+  "tags": []
+}
