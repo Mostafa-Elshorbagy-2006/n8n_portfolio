@@ -1,0 +1,1571 @@
+{
+  "name": "portofolio 2 - Office Rental CRM AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "updates": [
+          "message"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -64,
+        0
+      ],
+      "id": "4abb8691-32f4-425d-95bb-80fa4674fe56",
+      "name": "Telegram Trigger",
+      "webhookId": "f3d1e883-3782-47cb-819d-ff75c56410dc",
+      "credentials": {
+        "telegramApi": {
+          "id": "ohP93uwGl0ZisUz0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-v4-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        416,
+        352
+      ],
+      "id": "d4b63f13-2eba-49f6-a398-1c2feedb1229",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "2Q4O1OjCIKrJFPKF",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n\t\"Message_type\": \"From_AI_the_message_type\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        592,
+        368
+      ],
+      "id": "22facaf6-e7d6-4a54-8626-afff27cc5c17",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"business_type_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for business type. Must be 0, 5, or 10.\"\n    },\n    \"rental_purpose_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for rental purpose. Must be 0, 5, or 10.\"\n    },\n    \"employees_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for number of employees/users. Must be 0, 5, or 10.\"\n    },\n    \"office_size_layout_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for office size or layout requirements. Must be 0, 5, or 10.\"\n    },\n    \"preferred_location_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for preferred location. Must be 0, 5, or 10.\"\n    },\n    \"monthly_budget_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for monthly rental budget. Must be 0, 5, or 10.\"\n    },\n    \"move_in_timeline_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for move-in timeline. Must be 0, 5, or 10.\"\n    },\n    \"lease_duration_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for lease duration. Must be 0, 5, or 10.\"\n    },\n    \"extra_requirements_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for extra office requirements. Must be 0, 5, or 10.\"\n    },\n    \"decision_maker_contact_score\": {\n      \"enum\": [0, 5, 10],\n      \"description\": \"Score for decision maker status and contact information. Must be 0, 5, or 10.\"\n    },\n    \"total_score\": {\n      \"type\": \"number\",\n      \"description\": \"Total lead score out of 100, only output the number (Example: 90).\"\n    },\n    \"lead_status\": {\n      \"type\": \"string\",\n      \"description\": \"Lead classification (Hot lead from 80 to 100, warm lead from 50 to 79, cold lead from 0 to 49),the output must be one of those (Hot Lead, Warm Lead, Cold Lead) don't mention other details, don't output anything other than what i mentioned.\"\n    },\n    \"missing_information\": {\n      \"type\": \"array\",\n      \"items\": {\n        \"type\": \"string\"\n      },\n      \"description\": \"List of missing or unclear important lead fields.\"\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        2432,
+        -112
+      ],
+      "id": "fbe6c857-c0e5-4646-9460-360b9b99bdcc",
+      "name": "Structured Output Parser1"
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"type\": \"object\",\n  \"properties\": {\n    \"name\": {\n      \"type\": \"string\",\n      \"description\": \"Lead name if mentioned.\"\n    },\n    \"company\": {\n      \"type\": \"string\",\n      \"description\": \"Company name if mentioned.\"\n    },\n    \"business_type\": {\n      \"type\": \"string\",\n      \"description\": \"Type of business or activity.\"\n    },\n    \"purpose\": {\n      \"type\": \"string\",\n      \"description\": \"Reason for renting the office.\"\n    },\n    \"employees\": {\n      \"type\": \"string\",\n      \"description\": \"Number of employees or team size.\"\n    },\n    \"office_size\": {\n      \"type\": \"string\",\n      \"description\": \"Office size or layout requirements.\"\n    },\n    \"location\": {\n      \"type\": \"string\",\n      \"description\": \"Preferred location or area.\"\n    },\n    \"budget\": {\n      \"type\": \"string\",\n      \"description\": \"Monthly rental budget.\"\n    },\n    \"timeline\": {\n      \"type\": \"string\",\n      \"description\": \"Move-in timeline or start date.\"\n    },\n    \"lease_duration\": {\n      \"type\": \"string\",\n      \"description\": \"Desired rental duration.\"\n    },\n    \"requirements\": {\n      \"type\": \"string\",\n      \"description\": \"Extra requirements or facilities.\"\n    },\n    \"contact\": {\n      \"type\": \"string\",\n      \"description\": \"Contact information or decision maker details.\"\n    }\n  }\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        1872,
+        -112
+      ],
+      "id": "9a36c535-4594-4f3b-9f2b-c48bdf14c241",
+      "name": "Structured Output Parser2"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Telegram Trigger').item.json.message.from.id }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        1808,
+        384
+      ],
+      "id": "065489a8-1b8f-4ee6-a9f7-441b19293fdc",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-v4-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        -112
+      ],
+      "id": "e6a27356-c7a0-4a5b-a6ea-ba73d7b66b9c",
+      "name": "OpenRouter Chat Model1",
+      "credentials": {
+        "openRouterApi": {
+          "id": "2Q4O1OjCIKrJFPKF",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-v4-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        2208,
+        -112
+      ],
+      "id": "a8b91e9e-013f-4961-8e7c-c3b61d488551",
+      "name": "OpenRouter Chat Model2",
+      "credentials": {
+        "openRouterApi": {
+          "id": "2Q4O1OjCIKrJFPKF",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kMrm-iU6DAMgNtU8XfE5Kxe-ZuX2NaVWxQOUI84wyOY",
+          "mode": "list",
+          "cachedResultName": "portfolio 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrm-iU6DAMgNtU8XfE5Kxe-ZuX2NaVWxQOUI84wyOY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrm-iU6DAMgNtU8XfE5Kxe-ZuX2NaVWxQOUI84wyOY/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Costumer name": "={{ $('Telegram Trigger').item.json.message.from.first_name }} {{ $('Telegram Trigger').item.json.message.from.last_name }}",
+            "Contact ID": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+            "Lead name": "={{ $('Lead Data Extractor').item.json.output.properties.name.description }}",
+            "registeration time": "={{ $now }}",
+            "lead status": "={{ $json.output.properties.lead_status.description }}",
+            "total score": "={{ $json.output.properties.total_score.description }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Costumer name",
+              "displayName": "Costumer name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Contact ID",
+              "displayName": "Contact ID",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Lead name",
+              "displayName": "Lead name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lead status",
+              "displayName": "lead status",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "total score",
+              "displayName": "total score",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "registeration time",
+              "displayName": "registeration time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        2672,
+        -304
+      ],
+      "id": "61a9f15c-2e05-4ba1-ae91-4fc86bdecd46",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "v7qUPqnNfT2cAUMr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.Message }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        4176,
+        -208
+      ],
+      "id": "75c8f837-bc3d-418f-8db2-96636801d939",
+      "name": "Send a text message1",
+      "webhookId": "23527b3e-32c5-4e81-9629-314822132e6a",
+      "credentials": {
+        "telegramApi": {
+          "id": "ohP93uwGl0ZisUz0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-v4-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1648,
+        368
+      ],
+      "id": "4765d302-afd5-422c-ab35-ec5a3e922bc7",
+      "name": "OpenRouter Chat Model3",
+      "credentials": {
+        "openRouterApi": {
+          "id": "2Q4O1OjCIKrJFPKF",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "9217f938-ae8b-462e-a6f3-ffde961dce12",
+              "name": "System Prompt",
+              "value": "=You are a professional Customer Support Agent for a commercial office rental agency.\n\nYour job is to answer customer questions using the company information available in the connected Google Sheet, and to record customer complaints or suggestions in the dedicated feedback Google Sheet.\n\nYou must respond as one consistent support agent.\n\nMain responsibilities:\n1. Answer questions about the agency, office rental services, available offices, locations, prices, facilities, working hours, viewing process, required documents, contracts, payment terms, and general service information.\n2. Use the company information Google Sheet as the main source of truth before answering factual company questions.\n3. Do not invent prices, availability, locations, policies, documents, contract terms, payment rules, working hours, facilities, or contact details.\n4. If the requested information is not available in the Google Sheet, say politely that the information is not currently available and offer to forward the request to a real team member or ask for contact details.\n5. If the customer submits a complaint, suggestion, issue, or feedback, handle it politely and record it in the feedback Google Sheet.\n6. If the customer asks to speak with a real employee, sales representative, support team member, manager, or human agent, acknowledge the request politely and offer to forward the request to the team.\n\nWhen answering customer questions:\n- Be clear, helpful, professional, and concise.\n- Use Arabic if the customer speaks Arabic.\n- Use English if the customer speaks English.\n- If the customer asks about prices or availability, only provide confirmed information from the Google Sheet.\n- If exact information is missing, ask for the customer’s requirements so the team can follow up.\n- If the customer wants to schedule a viewing, use (human_handoff) tool to send to a team member to contact him< and inform him that a team member will comtact him\n- If the customer asks to speak with a human, tell him that the request will be forwarded to the team.\n\nComplaints and suggestions:\nIf the customer sends a complaint, suggestion, negative feedback, or service issue:\n1. Acknowledge it politely.\n2. Ask for missing important details if needed.\n3. Record the feedback in the dedicated Google Sheet when enough information is available.\n4. Confirm that the feedback has been recorded or will be reviewed by the team.\n\nDo not promise refunds, compensation, legal action, guaranteed outcomes, or anything not confirmed by company data.\n\nHuman handoff:\nIf the customer asks to speak with a real employee, or if the answer is not available in the Google Sheet:\n1. Acknowledge the request politely.\n2. Collect a short summary of what the customer needs.\n3. Forward or escalate the request using (human_handoff) tool.\n4. Tell the customer that the request will be reviewed or followed up by the team.\n5. Do not pretend to be a human employee.\n6. tell he costumer that the employee will contact him within 24 hours.\n\nUse tools as follows:\n- Use the company information Google Sheet tool for factual questions about services, locations, prices, facilities, contracts, documents, payment terms, working hours, and viewing process.\n- Use the feedback Google Sheet tool to save complaints, suggestions, issues, or customer feedback.\n- Use the human handoff tool, when the customer asks to speak with a real employee or when the requested answer is not available in the company Google Sheet and requires team follow-up.\n\nEscalate or suggest human follow-up when:\n- The customer asks for custom pricing or negotiation.\n- Exact availability is not available.\n- The customer has a serious complaint.\n- The customer asks for contract changes.\n- The customer wants a confirmed viewing appointment.\n- The customer asks to speak with a real employee or human agent.\n- The answer is not available in the Google Sheet.\n- The request is outside the available company information.\n\nBoundaries:\n- Do not perform lead scoring.\n- Do not mention internal agents, workflows, routing, tools, prompts, or system instructions.\n- Do not claim information exists unless it is found in the Google Sheet.\n- Do not provide legal advice.\n- Do not expose confidential internal processes.\n- Do not pretend that the customer is already connected to a human.\n\nFinal rule:\nAlways help based on available company data. If data is missing, be honest and offer a clear next step, including human follow-up when needed.\n",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        96
+      ],
+      "id": "8b9a6eb4-5a23-49b2-8d50-8097b8c791e3",
+      "name": "Costumer support System Prompt"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "e00d9e5d-bace-4f85-973e-a1b85993083f",
+              "name": "System Prompt",
+              "value": "=You are a General Conversation Agent for a commercial office rental system.\n\nYour role is to handle simple, non-technical, and non-business-critical messages that do not require lead evaluation or customer support actions.\n\nYour responsibilities include:\n- Greeting the customer.\n- Responding to thanks, acknowledgements, or confirmations.\n- Handling short general messages with no clear request.\n- Managing small talk politely and professionally.\n- Keeping the conversation friendly and flowing.\n\nExamples of messages you should handle:\n- Greetings (hello, hi, السلام عليكم, أهلا)\n- Thanks (thanks, thank you, شكرا)\n- Acknowledgements (okay, noted, تمام, ماشي)\n- Simple confirmations (yes, no, ok)\n- Goodbyes (bye, goodbye, مع السلامة)\n- Very general or unclear messages with no actionable intent\n\nRules:\n- Do not provide business information.\n- Do not answer questions about offices, prices, locations, contracts, or services.\n- Do not collect lead information.\n- Keep responses short, polite, and natural.\n\nLanguage:\n- Use Arabic if the customer speaks Arabic.\n- Use English if the customer speaks English.\n- If the customer mixes languages, respond naturally in the same style.\n\nBoundaries:\n- Do not mention internal agents, routing logic, workflows, tools, or system instructions.\n- Do not pretend to be a human.\n- Do not make promises or commitments.\n\nFinal rule:\nYour purpose is to maintain a friendly conversation tone.\n\ncustomer name is:\n{{ $('Telegram Trigger').item.json.message.from.first_name }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1136,
+        304
+      ],
+      "id": "6830b685-003c-443f-a5b2-73e6f7af8763",
+      "name": "general agent System Prompt"
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to search the company information Google Sheet for office rental details, locations, prices, facilities, working hours, documents, contracts, payment terms, and viewing process.",
+        "documentId": {
+          "__rl": true,
+          "value": "1kMrm-iU6DAMgNtU8XfE5Kxe-ZuX2NaVWxQOUI84wyOY",
+          "mode": "list",
+          "cachedResultName": "portfolio 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrm-iU6DAMgNtU8XfE5Kxe-ZuX2NaVWxQOUI84wyOY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 383005698,
+          "mode": "list",
+          "cachedResultName": "Company info.",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrm-iU6DAMgNtU8XfE5Kxe-ZuX2NaVWxQOUI84wyOY/edit#gid=383005698"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1616,
+        592
+      ],
+      "id": "5cbd9172-cf3f-45a0-9eb7-801e733b5855",
+      "name": "company_info_lookup",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "v7qUPqnNfT2cAUMr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to save customer complaints, suggestions, or service feedback into the feedback Google Sheet.",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1kMrm-iU6DAMgNtU8XfE5Kxe-ZuX2NaVWxQOUI84wyOY",
+          "mode": "list",
+          "cachedResultName": "portfolio 2",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrm-iU6DAMgNtU8XfE5Kxe-ZuX2NaVWxQOUI84wyOY/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 658795449,
+          "mode": "list",
+          "cachedResultName": "Feedback",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1kMrm-iU6DAMgNtU8XfE5Kxe-ZuX2NaVWxQOUI84wyOY/edit#gid=658795449"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "costumer name": "={{ $('Telegram Trigger').item.json.message.from.first_name }} {{ $('Telegram Trigger').item.json.message.from.last_name }}",
+            "Contact id": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+            "Feedback time": "={{ $now }}",
+            "feedback Brief": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('feedback_Brief', ``, 'string') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "costumer name",
+              "displayName": "costumer name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Contact id",
+              "displayName": "Contact id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "Feedback time",
+              "displayName": "Feedback time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "feedback Brief",
+              "displayName": "feedback Brief",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1904,
+        576
+      ],
+      "id": "1749df56-49d6-40e0-9734-28e020132148",
+      "name": "record_customer_feedback",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "v7qUPqnNfT2cAUMr",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "Use this tool to forward the customer request to a real employee when the customer asks for human support or when the answer is not available in the company information Google Sheet.",
+        "sendTo": "Put_An_Email",
+        "subject": "=Contact costumer",
+        "emailType": "text",
+        "message": "=contact {{ $('Telegram Trigger').item.json.message.from.first_name }} {{ $('Telegram Trigger').item.json.message.from.last_name }}\nhis chat id {{ $('Telegram Trigger').item.json.message.chat.id }}\nwhat he wants: {{ $fromAI(\"the_reason_for_the_handoff\") }}\nticket time {{ $now }}",
+        "options": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.gmailTool",
+      "typeVersion": 2.2,
+      "position": [
+        2448,
+        592
+      ],
+      "id": "c0693ecd-7799-4cf4-af74-48d1ca433d27",
+      "name": "handoff_to_human",
+      "webhookId": "aaff5b4e-0b4b-449f-99ea-8c1db272cd2b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "QXhAgqwbDKrAVVcB",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "ec3927d7-97a9-41f5-9552-29cd36999131",
+              "leftValue": "={{ $json.message.text }}",
+              "rightValue": "/start",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        144,
+        0
+      ],
+      "id": "63dc984c-47fd-4ab1-a714-fbbb178122f5",
+      "name": "Swich 1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "3ec273b3-072a-4c89-9d35-7ccfb72cd23d",
+              "name": "Hello message",
+              "value": "=Wlocome {{ $('Telegram Trigger').item.json.message.from.first_name }}, We are lokking forward to cooperate with you to build your Dream's Capital, let's start our jurney\n\nFrist, Please answer those 10 questions to start our jurney:\n\n- What is the company name, and What type of company or business are you renting the office for?\n- What will the office be used for?\n- How many employees or team members will use the office?\n- What office size or layout do you need? For example: square meters, number of rooms, open space, meeting room, reception area.\n- Which location or area are you looking for?\n- What is your monthly rental budget?\n- When are you planning to move in or start renting?\n- How long do you plan to rent the office?\n- Do you need any specific facilities such as furnished office, meeting room, parking, internet, security, reception, or private rooms?\n- Are you the decision maker for this rental request? And what is the best phone number or email for our leasing team to contact you?\n\nJust send me those 10 answers to begin the jurney",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        464,
+        -208
+      ],
+      "id": "6d64ecc0-6891-4584-9f17-99fbb796e2ab",
+      "name": "Hello message"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json['Hello message'] }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        656,
+        -208
+      ],
+      "id": "ee81f402-d107-4556-80dd-d85280771bc9",
+      "name": "Send a text message 1",
+      "webhookId": "23527b3e-32c5-4e81-9629-314822132e6a",
+      "credentials": {
+        "telegramApi": {
+          "id": "ohP93uwGl0ZisUz0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Latest customer message:\n{{ $json.message.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are a message router for a commercial office rental agency.\n\nYour only job is to read the latest customer message and the conversation context, then choose which one of the following agents should handle the message.\n\nAvailable agents:\n\n1. lead_evaluation_agent\nUse this when the customer provides or answers anything related to lead qualification, such as:\n- wanting to rent an office\n- company or business type\n- rental purpose\n- number of employees\n- office size or layout\n- preferred location\n- monthly budget\n- move-in timeline\n- lease duration\n- extra requirements\n- contact information\n- decision maker information\n- booking or scheduling a viewing after providing rental needs\n\n2. customer_support_agent\nUse this when the customer asks a question or requests information, such as:\n- available offices\n- prices or price ranges\n- locations\n- furnished or unfurnished offices\n- facilities like parking, internet, security, reception, meeting rooms\n- contract terms\n- payment terms\n- required documents\n- viewing process\n- company working hours\n- general service information\n\n3. general_agent\nUse this only for simple general messages, such as:\n- greetings\n- thanks\n- goodbye\n- small talk\n- unclear messages with no rental or support intent\n\nRouting rules:\n- If the message contains lead qualification information, route to lead_evaluation_agent.\n- If the message asks for information or support, route to customer_support_agent.\n- If the message is only a greeting, thanks, goodbye, or simple acknowledgement, route to general_agent.\n- If the message contains both a greeting and a business request, ignore the greeting and route based on the business request.\n- If the customer is answering a previous qualification question, route to lead_evaluation_agent.\n- If the customer provides contact information, route to lead_evaluation_agent.\n- If unsure between lead_evaluation_agent and customer_support_agent, choose lead_evaluation_agent when there is any rental need or client requirement.\n- If unsure and there is only a question, choose customer_support_agent.\n\nThe customer may speak Arabic, English, or both. Understand both languages.\n\nThe value of route_to must be exactly one of:\n- lead_evaluation_agent\n- customer_support_agent\n- general_agent\n\n- Return JSON only."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        432,
+        160
+      ],
+      "id": "abf015fa-9695-4cc4-a248-8733b8631313",
+      "name": "Message Router",
+      "retryOnFail": true,
+      "maxTries": 3
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json.output.Message_type }}",
+                    "rightValue": "lead_evaluation_agent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "f46cb0ca-4d3e-49af-b797-518c00f48d2d"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "lead_evaluation_agent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "637f2a78-f8ab-4d30-bfe9-b42c3ca88da7",
+                    "leftValue": "={{ $json.output.Message_type }}",
+                    "rightValue": "customer_support_agent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "customer_support_agent"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7bceab60-c503-43be-8cdf-a8ce195064d4",
+                    "leftValue": "={{ $json.output.Message_type }}",
+                    "rightValue": "general_agent",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "general_agent"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        800,
+        144
+      ],
+      "id": "ef534e6d-8849-4e14-b973-909eadb07be0",
+      "name": "Message type swich"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=\n {{ $('Telegram Trigger').item.json.message.text }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an AI Lead Data Extraction Agent for a commercial office rental agency.\n\nYour job is to extract structured lead information from the latest customer message and the conversation context.\n\nYou do NOT evaluate the lead.\nYou do NOT score the lead.\nYou do NOT respond to the customer.\nYou ONLY extract information that is explicitly mentioned by the customer.\n\nYou will receive:\n- The latest customer message\n\nYour task:\n- Identify and extract lead-related information if present.\n- Map each piece of information to the correct field.\n- If a piece of information is not mentioned or is unclear, return (not provided) for that field.\n- Do NOT guess or invent any data.\n- Do NOT normalize or rephrase values unnecessarily.\n- Keep extracted values clean, and human-readable.\n\n========================\nFIELDS TO EXTRACT\n========================\n\nExtract the following fields:\n\n- name: The customer's name, if mintioned, if doesn't use this name: {{ $('Telegram Trigger').item.json.message.from.first_name }} {{ $('Telegram Trigger').item.json.message.from.last_name }}.\n- company: Company name, if mentioned.\n- business_type: Type of business or activity.\n- purpose: Reason for renting the office.\n- employees: Number of employees or team size.\n- office_size: Office size, number of rooms, or layout requirements.\n- location: Preferred location or area.\n- budget: Monthly rental budget.\n- timeline: Move-in timeline or start date.\n- lease_duration: Desired rental duration.\n- requirements: Extra requirements or facilities.\n- contact: Contact information or decision maker details, if there is no contact information use this, (chat id: {{ $('Telegram Trigger').item.json.message.from.id }}).\n\n========================\nEXTRACTION RULES\n========================\n\n- If the customer mentions multiple values for the same field, extract the most recent or most specific one.\n- If the customer answers a question indirectly, still extract the information.\n- If the message contains Arabic, extract the values in Arabic.\n- If the message contains English, extract the values in English.\n- Do not translate values.\n- Do not summarize the conversation.\n- Do not include explanations.\n- Do not include confidence or assumptions.\n\n========================\nOUTPUT RULES\n========================\n\n- Return JSON only.\n- The output must strictly follow the provided structured output schema.\n- Do not include markdown.\n- Do not include any text outside the JSON.\n- Do not include additional fields.\n- if a value was not provided, return (not provided) for that value only\n\nYour output will be parsed by a Structured Output Parser."
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        1680,
+        -304
+      ],
+      "id": "f61e8e36-d319-4740-bfb7-6290adaa538e",
+      "name": "Lead Data Extractor",
+      "retryOnFail": true,
+      "maxTries": 3
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Evaluate this lead data:\n\nLead name: {{ $json.output.properties.name.description }}\nCompany: {{ $json.output.properties.company.description }}\nBusiness type: {{ $json.output.properties.business_type.description }}\nPurpose: {{ $json.output.properties.purpose.description }}\nEmployees: {{ $json.output.properties.employees.description }}\nOffice size/layout: {{ $json.output.properties.office_size.description }}\nLocation: {{ $json.output.properties.location.description }}\nBudget: {{ $json.output.properties.budget.description }}\nMove-in timeline: {{ $json.output.properties.timeline.description }}\nLease duration: {{ $json.output.properties.lease_duration.description }}\nExtra requirements: {{ $json.output.properties.requirements.description }}\nDecision maker/contact: {{ $json.output.properties.contact.description }}",
+        "hasOutputParser": true,
+        "messages": {
+          "messageValues": [
+            {
+              "message": "=You are an AI Lead Quality Evaluator for a commercial office rental agency.  Your job is to evaluate how valuable and sales-ready a lead is for renting administrative/commercial office units.  Do not score based only on how clear the answers are. Score mainly based on lead quality, business fit, seriousness, urgency, budget fit, rental potential, and likelihood to convert.  Evaluate the lead out of 100 points using 10 criteria. Each criterion is worth 10 points.  For each criterion, use only: - 10 points = strong, valuable, suitable lead signal - 5 points = acceptable but not ideal / partial fit / needs clarification - 0 points = weak, missing, unsuitable, unrealistic, or low-value signal  Do not use scores other than 0, 5, or 10.  Criteria:  1. Business Type Quality Score high if the lead represents a real company, agency, startup, corporate team, consulting firm, software company, marketing agency, or any serious business activity. Score low if there is no clear business activity.  2. Rental Purpose Quality Score high if the office is needed for a serious business purpose such as headquarters, branch, expansion, team operations, client meetings, or moving from another office. Score low if the purpose is vague, casual, or not business-related.  3. Team Size / Demand Quality Score high if the team size clearly justifies renting an office. Score medium for small teams or approximate numbers. Score low if no team size is provided or the need seems too small.  4. Office Size / Layout Fit Score high if the required space, rooms, layout, or office setup is realistic and matchable. Score medium if the requirement is general or flexible. Score low if missing, unclear, or unrealistic.  5. Location Fit Score high if the lead provides a clear suitable business location or is flexible within reasonable areas. Score medium for broad or unclear but usable location. Score low if missing or unsuitable.  6. Budget Quality Score high if the monthly budget is realistic and commercially attractive for office rental. Score medium if the budget is approximate, flexible, or possibly acceptable. Score low if missing, unrealistic, or too low. A clear but unrealistic budget should not receive 10 points.  7. Move-in Timeline / Urgency Score high if the lead wants to move immediately or within 1 month. Score medium if within 1 to 3 months. Score low if missing, uncertain, or very far in the future.  8. Lease Duration Quality Score high if the lead wants 12 months or more. Score medium if 3 to 12 months or flexible. Score low if missing or very short-term.  9. Requirements Fit Score high if the lead has practical office requirements such as furnished office, meeting room, parking, internet, reception, security, private rooms, or 24/7 access. Score medium if requirements are general or flexible. Score low if missing, unrealistic, or excessive.  10. Decision Maker & Contact Quality Score high if the lead is the owner, founder, manager, operations/admin manager, or responsible person and provides valid contact information. Score medium if the person is not the final decision maker but is responsible for collecting options and provides contact information. Score low if contact information is missing or the person has no clear role in the decision.  Lead status: - Hot Lead: 80-100 - Warm Lead: 50-79 - Cold Lead: 0-49  Important status rules: - If contact information is missing, the lead cannot be Hot Lead. - If budget is missing or clearly unrealistic, the lead cannot be Hot Lead. - If budget, location, and move-in timeline are all missing, the lead must be Cold Lead. - If the request is not related to commercial office rental, classify as Cold Lead.  Missing information: If important information is missing or unclear, add it to missing_information. Possible missing fields: business_type, rental_purpose, employees, office_size_layout, preferred_location, monthly_budget, move_in_timeline, lease_duration, extra_requirements, decision_maker_contact.  Rules: - Do not invent missing information. - Do not over-score a lead just because the answer is clear. - A clear but low-quality lead should receive a low score. - A vague but promising lead may receive medium scores. - total_score must equal the sum of all 10 score fields. \n- Return ONLY valid JSON.\n- Do not wrap the response in markdown.\n- Do not use code fences.\n- Do not add explanations.\n- Do not add an \"output\" key.\n- Return the JSON object directly.\n"
+            }
+          ]
+        },
+        "batching": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainLlm",
+      "typeVersion": 1.9,
+      "position": [
+        2256,
+        -304
+      ],
+      "id": "a2f30bb4-d35d-4665-9439-1fa61b828e05",
+      "name": "Lead Evaluator",
+      "retryOnFail": true
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $('Telegram Trigger').item.json.message.text }}",
+        "options": {
+          "systemMessage": "={{ $json['System Prompt'] }}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1680,
+        144
+      ],
+      "id": "e531071f-203a-42e5-bfff-fe103a03df80",
+      "name": "Coustomer support"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $json['lead status'] }}",
+                    "rightValue": "Hot Lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "8ae2ffa8-70a2-4eef-891f-6cf8753f3de3"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Hot Lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8753e045-4e2a-412e-9f6d-3f84a89b3d85",
+                    "leftValue": "={{ $json['lead status'] }}",
+                    "rightValue": "Warm Lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Warm Lead"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "4c838892-b6f2-4685-91cd-23aa05857a59",
+                    "leftValue": "={{ $json['lead status'] }}",
+                    "rightValue": "Cold Lead",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Cold Lead"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        3024,
+        -320
+      ],
+      "id": "cf25cf78-a1f8-4492-8c50-efa689f3c7a2",
+      "name": "Switch Based On lead Degree"
+    },
+    {
+      "parameters": {
+        "sendTo": "Put_An_Email",
+        "subject": "New Lead!",
+        "emailType": "text",
+        "message": "=We have a new lead!\nCostumer name is {{ $json['Costumer name'] }}\nregistering time is {{ $now }}\nthe lead score is {{ $('Append row in sheet').item.json['total score'] }}\ncompany name is {{ $('Append row in sheet').item.json['Lead name'] }}\ncontact info: chat ID: {{ $('Telegram Trigger').item.json.message.from.id }}\nContact him now!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3360,
+        -320
+      ],
+      "id": "2023cd75-4bcd-4cd3-9919-0417681ec002",
+      "name": "Send a message to the team",
+      "webhookId": "8f37b0cc-5de1-41e6-b8d8-9cc9fcd0818b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "QXhAgqwbDKrAVVcB",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sendTo": "Put_An_Email",
+        "subject": "New Lead!",
+        "emailType": "text",
+        "message": "=We have a new lead!\nCostumer name is {{ $json['Costumer name'] }}\nregistering time is {{ $now }}\nthe lead score is {{ $('Append row in sheet').item.json['total score'] }}\ncompany name is {{ $('Append row in sheet').item.json['Lead name'] }}\ncontact info: chat ID: {{ $('Telegram Trigger').item.json.message.from.id }}\nContact him now!",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.gmail",
+      "typeVersion": 2.2,
+      "position": [
+        3360,
+        -144
+      ],
+      "id": "e566baae-163a-4fb8-88f8-77772fc011d9",
+      "name": "Send a message to the team 1",
+      "webhookId": "8f37b0cc-5de1-41e6-b8d8-9cc9fcd0818b",
+      "credentials": {
+        "gmailOAuth2": {
+          "id": "QXhAgqwbDKrAVVcB",
+          "name": "Gmail account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "388eaf76-93c1-46ed-9065-6eabd693fef6",
+              "name": "Message",
+              "value": "=Nice, we've registerd your request {{ $('Telegram Trigger').item.json.message.from.first_name }}, and it perfectly fits to our rules We appreciate your time, One of our team members will reach out to you within one hour (in shaa allah)",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3744,
+        -304
+      ],
+      "id": "c69be19e-5aa1-48cc-8223-c9150e32cd8d",
+      "name": "Hot Lead Respond"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "c868f94a-489d-46d8-9296-c35eba7f7a25",
+              "name": "Message",
+              "value": "=Nice, we've registerd your request {{ $('Telegram Trigger').item.json.message.from.first_name }}\nOne of our feam members will reach out to you within one Day (in shaa allah)",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3936,
+        -208
+      ],
+      "id": "0798c028-7749-4167-9d22-6d3aec082b7a",
+      "name": "Warm Lead Respond"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "5b909bbf-2654-458b-a78f-f1fe5e500a7d",
+              "name": "Message",
+              "value": "thanks for contacting us!  your request will be reviewed!",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3744,
+        -128
+      ],
+      "id": "6deedf51-436e-4fba-b6ec-bb3cf02378a1",
+      "name": "cold Lead Respond"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram Trigger').item.json.message.from.id }}",
+        "text": "={{ $json.output }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2336,
+        144
+      ],
+      "id": "3bc1cbb7-3b53-4adf-9903-f6c1f9a45506",
+      "name": "Send a text message",
+      "webhookId": "23527b3e-32c5-4e81-9629-314822132e6a",
+      "credentials": {
+        "telegramApi": {
+          "id": "ohP93uwGl0ZisUz0",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Message in",
+        "height": 368,
+        "width": 528,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -176,
+        -128
+      ],
+      "id": "1c0c6671-f049-477b-9efe-8f47d11de478",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Hello message",
+        "height": 416,
+        "width": 560,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -384
+      ],
+      "id": "17d2fc63-467d-4d9a-884e-0b65825efc7c",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Message Router",
+        "height": 464,
+        "width": 560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        48
+      ],
+      "id": "acf09893-5894-4565-bfb7-0f3f2420cad3",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## System Prompt",
+        "height": 464,
+        "width": 560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        944,
+        48
+      ],
+      "id": "4058c133-d8d2-45a6-a3e9-103f950b7658",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## System Prompt",
+        "height": 464,
+        "width": 560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        48
+      ],
+      "id": "fd2e9500-2353-4a58-95a8-c6a9af9b9eb4",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "## Company - Leads Database",
+        "height": 240,
+        "width": 560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        528
+      ],
+      "id": "49b34cf0-9c47-4e7f-b1f9-a495ec090c9f",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Human Handoff",
+        "height": 240,
+        "width": 560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2096,
+        528
+      ],
+      "id": "722f2e87-a0e5-460f-a564-7ac92eb84adf",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "## Message Out\n",
+        "height": 464,
+        "width": 560,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2096,
+        48
+      ],
+      "id": "54422aa3-c24a-44c4-a373-6900f171ef4b",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "## Lead Data Extractor\n",
+        "height": 416,
+        "width": 560,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        -384
+      ],
+      "id": "efbef8e3-8949-4482-b14f-9b3046085b55",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "content": "## Lead Evaluator\n",
+        "height": 416,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2096,
+        -384
+      ],
+      "id": "f9a87249-d9c7-4be8-a2ef-ef32da4c72f8",
+      "name": "Sticky Note9"
+    },
+    {
+      "parameters": {
+        "content": "## Lead Type Router\n",
+        "height": 416,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        2912,
+        -384
+      ],
+      "id": "f289e520-fdcf-490f-a8b6-2e6a3a17cebc",
+      "name": "Sticky Note10"
+    },
+    {
+      "parameters": {
+        "content": "## Inform Staff\n",
+        "height": 416,
+        "width": 320,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3248,
+        -384
+      ],
+      "id": "15962cda-5cf3-4a98-80e1-2a6d134c011f",
+      "name": "Sticky Note11"
+    },
+    {
+      "parameters": {
+        "content": "## Message out",
+        "height": 416,
+        "width": 800,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        3584,
+        -384
+      ],
+      "id": "e8b4afa1-a687-4bca-8743-533107768d68",
+      "name": "Sticky Note13"
+    },
+    {
+      "parameters": {
+        "content": "## Made By:\n## Mostafa Elshorbagy\n\n## LinkedIn:\n## https://www.linkedin.com/in/mostafa-elshorbagy",
+        "height": 416,
+        "width": 560,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        944,
+        -384
+      ],
+      "id": "3624fbbd-42c1-4704-958b-34cfccc40772",
+      "name": "Sticky Note12"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Telegram Trigger": {
+      "main": [
+        [
+          {
+            "node": "Swich 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Message Router",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Message Router",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser1": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Lead Evaluator",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser2": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "Lead Data Extractor",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "Coustomer support",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Lead Data Extractor",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Lead Evaluator",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet": {
+      "main": [
+        [
+          {
+            "node": "Switch Based On lead Degree",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model3": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Coustomer support",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Costumer support System Prompt": {
+      "main": [
+        [
+          {
+            "node": "Coustomer support",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "general agent System Prompt": {
+      "main": [
+        [
+          {
+            "node": "Coustomer support",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "company_info_lookup": {
+      "ai_tool": [
+        [
+          {
+            "node": "Coustomer support",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "record_customer_feedback": {
+      "ai_tool": [
+        [
+          {
+            "node": "Coustomer support",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "handoff_to_human": {
+      "ai_tool": [
+        [
+          {
+            "node": "Coustomer support",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Swich 1": {
+      "main": [
+        [
+          {
+            "node": "Hello message",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Message Router",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hello message": {
+      "main": [
+        [
+          {
+            "node": "Send a text message 1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message Router": {
+      "main": [
+        [
+          {
+            "node": "Message type swich",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Message type swich": {
+      "main": [
+        [
+          {
+            "node": "Lead Data Extractor",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Costumer support System Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "general agent System Prompt",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Data Extractor": {
+      "main": [
+        [
+          {
+            "node": "Lead Evaluator",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Lead Evaluator": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Coustomer support": {
+      "main": [
+        [
+          {
+            "node": "Send a text message",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Switch Based On lead Degree": {
+      "main": [
+        [
+          {
+            "node": "Send a message to the team",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Send a message to the team 1",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "cold Lead Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message to the team": {
+      "main": [
+        [
+          {
+            "node": "Hot Lead Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a message to the team 1": {
+      "main": [
+        [
+          {
+            "node": "Warm Lead Respond",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Hot Lead Respond": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Warm Lead Respond": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "cold Lead Respond": {
+      "main": [
+        [
+          {
+            "node": "Send a text message1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message": {
+      "main": [
+        []
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "timeSavedMode": "fixed",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "0fbf8a12-4bc4-4630-aad6-5c2707e5c916",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "8defac8a00b4e0cd832402d6250653f9b476f2f5eb605cb351d028eee4d5b571"
+  },
+  "id": "ezA1j2mA86mwX4jG",
+  "tags": []
+}
