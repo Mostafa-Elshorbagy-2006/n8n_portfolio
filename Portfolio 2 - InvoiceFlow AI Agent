@@ -1,0 +1,550 @@
+{
+  "name": "InvoiceFlow AI Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "pollTimes": {
+          "item": [
+            {
+              "mode": "everyMinute"
+            }
+          ]
+        },
+        "triggerOn": "specificFolder",
+        "folderToWatch": {
+          "__rl": true,
+          "value": "1_ObBfjS5gGiXwYji9OWKSTcOsPZpN_5e",
+          "mode": "list",
+          "cachedResultName": "invoices",
+          "cachedResultUrl": "https://drive.google.com/drive/folders/1_ObBfjS5gGiXwYji9OWKSTcOsPZpN_5e"
+        },
+        "event": "fileCreated",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDriveTrigger",
+      "typeVersion": 1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "e6dec8eb-aef9-40f7-9d47-0650bb048aab",
+      "name": "Google Drive Trigger",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "eSQmSSlyV7DuptyW",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        224,
+        0
+      ],
+      "id": "bf975491-93d7-4a94-a1c7-d66c6c5c9d87",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {
+        "operation": "download",
+        "fileId": {
+          "__rl": true,
+          "value": "={{ $json.id }}",
+          "mode": "id"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleDrive",
+      "typeVersion": 3,
+      "position": [
+        448,
+        0
+      ],
+      "id": "dee0fba8-bcf4-4a6a-a628-8ec9d3c35c54",
+      "name": "Download file",
+      "credentials": {
+        "googleDriveOAuth2Api": {
+          "id": "eSQmSSlyV7DuptyW",
+          "name": "Google Drive account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://openrouter.ai/api/v1/chat/completions",
+        "authentication": "genericCredentialType",
+        "genericAuthType": "httpHeaderAuth",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"model\": \"google/gemini-2.5-flash\",\n  \"messages\": [\n    {\n      \"role\": \"user\",\n      \"content\": [\n        {\n          \"type\": \"text\",\n          \"text\": \"You are an invoice data extraction assistant. Analyze the invoice image and extract only these fields: seller_name, customer_name, number_of_items, Invoice No, total_cost, date_of_issue. Rules: Extract only clearly visible information. Do not guess or invent missing values. If any field is missing or unclear, write \\\"empty\\\". number_of_items means the number of invoice line items listed in the items table, not the total quantity. total_cost means the final total amount due, gross total, amount due, or grand total. Return exactly these keys: seller_name,  customer_name, number_of_items, total_cost, Invoice No, date_of_issue. Do not use markdown.\"\n        },\n        {\n          \"type\": \"image_url\",\n          \"image_url\": {\n            \"url\": \"{{$json.image_data_url}}\"\n          }\n        }\n      ]\n    }\n  ],\n  \"temperature\": 0,\n  \"max_tokens\": 500\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.4,
+      "position": [
+        896,
+        0
+      ],
+      "id": "9abdb678-7cba-4adc-9f4e-4e7254df8317",
+      "name": "Analyze Image",
+      "credentials": {
+        "httpHeaderAuth": {
+          "id": "Qu2wyuwiqMGkcZTv",
+          "name": "Header Auth account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsCode": "const output = [];\n\nfor (let i = 0; i < items.length; i++) {\n  const binaryData = items[i].binary?.data;\n\n  if (!binaryData) {\n    output.push({\n      json: {\n        error: \"No binary data found\",\n        fileName: items[i].json.name || \"empty\",\n        mimeType: \"empty\",\n        image_base64: \"empty\",\n        image_data_url: \"empty\"\n      }\n    });\n    continue;\n  }\n\n  const buffer = await this.helpers.getBinaryDataBuffer(i, 'data');\n  const mimeType = binaryData.mimeType || \"image/jpeg\";\n  const base64 = buffer.toString('base64');\n\n  output.push({\n    json: {\n      ...items[i].json,\n      fileName: binaryData.fileName || items[i].json.name || \"empty\",\n      mimeType,\n      image_base64: base64,\n      image_data_url: `data:${mimeType};base64,${base64}`\n    }\n  });\n}\n\nreturn output;"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        672,
+        0
+      ],
+      "id": "e2562130-d44a-4ee7-a324-ce940330a579",
+      "name": "Convert Image to Base64"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=the invoice information:\n{{ $json.choices[0].message.content }}",
+        "options": {
+          "systemMessage": "=## you are an invoice recorder, your rule is to take the invoice information and register it in the google sheet\n\n## rules:\n- register the given information as it is, don't change anything\n- if the given information is empty leave it as it is, don't make up any information\n- if there is any information missing from (seller_name, customer_name, number_of_items, total_cost, Invoice No., date_of_issue) handoff the invoice\n- in handoff case, send the text message first then the invoice image\n- if there are missing informatio, don't register the invoice, just handoff to a human employee\n\n## tools:\n- Append row in sheet in Google Sheets: use this tool to register an invoice\n- Send a text message in Telegram: use this tool to hanoff a message to a human employee when there is missing information\n- Send a photo message in Telegram: use this tool in handoff case to send the invoice image to the human employee"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        1232,
+        0
+      ],
+      "id": "00da285a-97c0-4036-82dd-bd4276bb7c32",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "google/gemini-2.5-flash",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        1136,
+        224
+      ],
+      "id": "3b4a87c7-af42-4266-bc8d-68336b546523",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "PbvHs7kJYmNigTeJ",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "use this tool to save the invoice information in Google Sheets",
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1UiR-60eBwW3juojksDmJAbOLXTmft4IdlyivVZ85GMw",
+          "mode": "list",
+          "cachedResultName": "Invoices",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UiR-60eBwW3juojksDmJAbOLXTmft4IdlyivVZ85GMw/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "الورقة1",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1UiR-60eBwW3juojksDmJAbOLXTmft4IdlyivVZ85GMw/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Date of issue": "={{ $fromAI('date_of_issue') }}",
+            "client name": "={{ $fromAI('customer_name') }}",
+            "seller name": "={{ $fromAI('seller_name') }}",
+            "No. of items": "={{ $fromAI('number_of_items') }}",
+            "total price": "={{ $fromAI('total_cost') }}",
+            " Invoice No.": "={{ $fromAI('Invoice_No') }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Date of issue",
+              "displayName": "Date of issue",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "client name",
+              "displayName": "client name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "seller name",
+              "displayName": "seller name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "No. of items",
+              "displayName": "No. of items",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "total price",
+              "displayName": "total price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": " Invoice No.",
+              "displayName": " Invoice No.",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.7,
+      "position": [
+        1296,
+        304
+      ],
+      "id": "ebca5eb5-bbc3-403d-b90a-7cefa2b80ba6",
+      "name": "Append row in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "0b39MBgQIi8qbAgN",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "use this tool to handoff a message to a human employee only when there is information missing in the invoice, the human employee will take care of it",
+        "chatId": "=6824548232",
+        "text": "=there is information missing in this invoice\nwhat's missing: {{ $fromAI('the_missing_info') }}",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegramTool",
+      "typeVersion": 1.2,
+      "position": [
+        1584,
+        304
+      ],
+      "id": "b1c34619-a963-44db-88b1-6fd7dfbb74c4",
+      "name": "Send a text message in Telegram",
+      "webhookId": "678368b2-77e0-4e30-ba49-e9bdc1c94d3b",
+      "credentials": {
+        "telegramApi": {
+          "id": "CIYKvA91B2BvwH8E",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "descriptionType": "manual",
+        "toolDescription": "use this tool to handoff a message to a human employee only when there is information missing in the invoice, the human employee will take care of it",
+        "operation": "sendPhoto",
+        "chatId": "=6824548232",
+        "binaryData": true,
+        "binaryPropertyName": "={{ $('Download file').item.binary.data }}",
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTool",
+      "typeVersion": 1.2,
+      "position": [
+        1472,
+        320
+      ],
+      "id": "bf48135d-ca47-46fe-82ce-948d2c2ba765",
+      "name": "Send a photo message in Telegram",
+      "webhookId": "678368b2-77e0-4e30-ba49-e9bdc1c94d3b",
+      "credentials": {
+        "telegramApi": {
+          "id": "CIYKvA91B2BvwH8E",
+          "name": "Telegram account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Invoice in (Image)",
+        "height": 272,
+        "width": 448,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        -80
+      ],
+      "id": "a6bcc202-e6ac-4643-a188-24e08e884243",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Get the Image",
+        "height": 272,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        368,
+        -80
+      ],
+      "id": "da2ee11b-eab5-48f1-97ef-bb1561f230ea",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Analyze the Image",
+        "height": 272,
+        "width": 448,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        624,
+        -80
+      ],
+      "id": "25134f0e-82dc-41d4-888b-cdc653b7fd77",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "content": "## Invoice registration Agent",
+        "height": 560,
+        "width": 624,
+        "color": 6
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1088,
+        -80
+      ],
+      "id": "f4d8c8d2-02ed-4138-8129-3c749f670676",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "## Human HandOff (If there is any missing Information)",
+        "height": 320,
+        "width": 272,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1440,
+        160
+      ],
+      "id": "372f8334-c07b-4343-b520-c7b52506df62",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "\n# Made By: Mostafa Elshorbagy\n\n\n# LinkedIn: https://www.linkedin.com/in/Mostafa-Elshorbagy",
+        "height": 272,
+        "width": 1168,
+        "color": 5
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        208
+      ],
+      "id": "126eaf6b-c1d0-4f3a-b09b-118694981d19",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "## Register the Invoice In google Sheet",
+        "height": 320,
+        "width": 192,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        160
+      ],
+      "id": "92cb7218-e5ab-48d0-80a4-a56f5e98e555",
+      "name": "Sticky Note6"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Google Drive Trigger": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Download file",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Download file": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Convert Image to Base64",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Convert Image to Base64": {
+      "main": [
+        [
+          {
+            "node": "Analyze Image",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Analyze Image": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Append row in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a text message in Telegram": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Send a photo message in Telegram": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate"
+  },
+  "versionId": "4f2e1c4d-2a93-44b8-a8c7-c87b4c93749e",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "1f484328f671d2e674db0e1f23d4e6deff16edf12cd0d3803ee113953d96b976"
+  },
+  "nodeGroups": [],
+  "id": "1zHzoaihUdGLssld",
+  "tags": []
+}
